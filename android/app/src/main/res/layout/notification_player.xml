@@ -1,0 +1,105 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:background="@drawable/bg_azonto_notification"
+  android:orientation="vertical"
+  android:padding="12dp">
+
+  <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <FrameLayout
+      android:layout_width="46dp"
+      android:layout_height="46dp"
+      android:background="@drawable/bg_azonto_notification_icon">
+
+      <ImageView
+        android:id="@+id/notificationLogo"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_gravity="center"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_azonto_notification"
+        android:tint="#FFFFFFFF" />
+    </FrameLayout>
+
+    <LinearLayout
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="12dp"
+      android:layout_weight="1"
+      android:orientation="vertical">
+
+      <TextView
+        android:id="@+id/notificationTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="#FFFFFFFF"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/notificationArtist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="#FFFFC247"
+        android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:gravity="center"
+      android:orientation="horizontal">
+
+      <ImageView
+        android:id="@+id/notificationPrevious"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:background="@drawable/bg_azonto_notification_control"
+        android:contentDescription="Precedent"
+        android:padding="9dp"
+        android:src="@drawable/ic_azonto_previous"
+        android:tint="#FFFFFFFF" />
+
+      <ImageView
+        android:id="@+id/notificationToggle"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
+        android:layout_marginStart="7dp"
+        android:layout_marginEnd="7dp"
+        android:background="@drawable/bg_azonto_notification_icon"
+        android:contentDescription="Lecture"
+        android:padding="10dp"
+        android:tint="#FFFFFFFF" />
+
+      <ImageView
+        android:id="@+id/notificationNext"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:background="@drawable/bg_azonto_notification_control"
+        android:contentDescription="Suivant"
+        android:padding="9dp"
+        android:src="@drawable/ic_azonto_next"
+        android:tint="#FFFFFFFF" />
+    </LinearLayout>
+  </LinearLayout>
+
+  <ProgressBar
+    android:id="@+id/notificationProgress"
+    style="?android:attr/progressBarStyleHorizontal"
+    android:layout_width="match_parent"
+    android:layout_height="6dp"
+    android:layout_marginTop="10dp"
+    android:indeterminate="false"
+    android:max="100"
+    android:progressDrawable="@drawable/progress_azonto_notification" />
+</LinearLayout>

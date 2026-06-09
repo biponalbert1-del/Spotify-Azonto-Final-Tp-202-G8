@@ -1,5 +1,6 @@
 # Azonto - Documentation du projet
-
+install puis effectue les migration
+36072020BI75++pon
 Azonto est une application mobile React Native de lecture musicale. Elle propose une experience proche d'une application de streaming: accueil, exploration par genre ou region, recherche, bibliotheque, favoris, playlists locales, profil utilisateur et lecteur audio complet.
 
 Le projet cible principalement Android. Il utilise React Native pour l'interface, `react-native-sound` pour la lecture audio, des fichiers audio locaux comme solution de secours, et Supabase pour l'authentification ainsi que le catalogue distant de chansons.
