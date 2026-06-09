@@ -1,35 +1,28 @@
-<<<<<<< HEAD
 # Azonto - Documentation du projet
-install puis effectue les migration
-36072020BI75++pon
-Azonto est une application mobile React Native de lecture musicale. Elle propose une experience proche d'une application de streaming: accueil, exploration par genre ou region, recherche, bibliotheque, favoris, playlists locales, profil utilisateur et lecteur audio complet.
-=======
-# Token Transfer App
 
-Application Flutter/Dart pour simuler un portefeuille de jetons evenementiel avec paiement NFC, detection de proximite BLE/Wi-Fi et liste de terminaux autorises.
->>>>>>> 9978150320699f62b7cb099a92d9f1d2b4b24331
+Azonto est une application mobile React Native de lecture musicale. Elle propose une expérience proche d'une application de streaming : accueil, exploration par genre ou région, recherche, bibliothèque, favoris, playlists locales, profil utilisateur et lecteur audio complet.
 
-## Fonctionnalites
+## Installation et Configuration
 
-- Portefeuille local avec solde en jetons NBP.
-- Base de donnees integree SQLite.
-- Detection automatique simulee des utilisateurs proches a moins de 4 cm.
-- Transfert de jetons entre utilisateurs.
-- Historique des transactions.
-- Terminaux de paiement autorises pour eviter les abus.
-- Service NFC pret a brancher via `nfc_manager`.
-- Couche blockchain simulee inspiree de l'abstraction de compte ERC-4337.
+1. Installez les dépendances :
+   ```bash
+   npm install
+   ```
 
-## Commandes
+2. Effectuez les migrations Supabase si nécessaire (voir dossier `supabase/migrations`).
 
-```bash
-flutter pub get
-flutter run
-flutter build apk --release
-flutter build appbundle --release
-```
+3. Lancez l'application :
+   ```bash
+   npm run android  # Pour Android
+   npm run ios      # Pour iOS
+   ```
 
-Les artefacts attendus apres build sont:
+## Fonctionnalités
 
-- `build/app/outputs/flutter-apk/app-release.apk`
-- `build/app/outputs/bundle/release/app-release.aab`
+- Accueil avec recommandations musicales.
+- Exploration par genre ou région.
+- Recherche de titres.
+- Bibliothèque personnelle et favoris.
+- Gestion de playlists locales.
+- Profil utilisateur.
+- Lecteur audio complet (Play/Pause, Suivant/Précédent, Barre de progression).
