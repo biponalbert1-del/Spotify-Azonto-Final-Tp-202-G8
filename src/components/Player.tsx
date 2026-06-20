@@ -75,12 +75,104 @@ export function PlayerSheet({
   );
 }
 
+const EQ_PRESETS: Record<string, number[]> = {
+  Normal: [0, 0, 0, 0, 0],
+  Pop: [2, 1, 0, 1, 2],
+  Rock: [4, 2, -1, 2, 4],
+  Jazz: [3, 2, 1, 2, 3],
+  Classique: [-2, -1, 0, 2, 2],
+  'Bass Boost': [6, 4, 0, 0, 0],
+};
+
+function VolumeSlider({value, onChange}: {value: number; onChange: (v: number) => void}) {
+  const [width, setWidth] = useState(0);
+  return (
+    <View style={{flexDirection: 'row', alignItems: 'center', marginVertical: 10}}>
+      <Text style={{color: '#fff', marginRight: 10, fontSize: 14}}>🔊</Text>
+      <Pressable
+        style={{flex: 1, height: 20, justifyContent: 'center'}}
+        onLayout={e => setWidth(e.nativeEvent.layout.width)}
+        onPress={e => {
+          if (width > 0) {
+            onChange(Math.max(0, Math.min(1, e.nativeEvent.locationX / width)));
+          }
+        }}
+      >
+        <View style={{height: 6, backgroundColor: '#333', borderRadius: 3, width: '100%'}}>
+          <View style={{height: 6, backgroundColor: '#ff7a08', borderRadius: 3, width: `${value * 100}%`}} />
+        </View>
+      </Pressable>
+      <Text style={{color: '#fff', marginLeft: 10, fontSize: 12, width: 35}}>{Math.round(value * 100)}%</Text>
+    </View>
+  );
+}
+
+function EqualizerBand({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+}) {
+  const [height, setHeight] = useState(0);
+  const percent = (value + 12) / 24; // map -12..12 to 0..1
+  return (
+    <View style={{alignItems: 'center', marginHorizontal: 8}}>
+      <Text style={{color: '#888', fontSize: 10, marginBottom: 5}}>
+        {value > 0 ? `+${value}` : value} dB
+      </Text>
+      <Pressable
+        style={{width: 30, height: 120, alignItems: 'center', justifyContent: 'center'}}
+        onLayout={e => setHeight(e.nativeEvent.layout.height)}
+        onPress={e => {
+          if (height > 0) {
+            const fraction = 1 - e.nativeEvent.locationY / height;
+            const dbVal = Math.round(fraction * 24 - 12);
+            onChange(Math.max(-12, Math.min(12, dbVal)));
+          }
+        }}
+      >
+        <View style={{width: 6, height: '100%', backgroundColor: '#333', borderRadius: 3, position: 'relative'}}>
+          <View
+            style={{
+              width: 6,
+              height: `${percent * 100}%`,
+              backgroundColor: '#ff7a08',
+              borderRadius: 3,
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+            }}
+          />
+          <View
+            style={{
+              width: 14,
+              height: 14,
+              borderRadius: 7,
+              backgroundColor: '#fff',
+              position: 'absolute',
+              bottom: `${percent * 100}%`,
+              marginBottom: -7,
+              left: -4,
+            }}
+          />
+        </View>
+      </Pressable>
+      <Text style={{color: '#fff', fontSize: 11, marginTop: 5}}>{label}</Text>
+    </View>
+  );
+}
+
 export function FullPlayerScreen({
   track,
   isPlaying,
   position,
   duration,
-  isRepeat,
+  loopMode,
+  volume,
+  onVolumeChange,
   isAdded,
   isCasting,
   onClose,
@@ -91,6 +183,7 @@ export function FullPlayerScreen({
   onToggleLike,
   onToggleAdd,
   onShare,
+  onDownload,
   onSetRingtone,
   onAddToPlaylist,
   onToggleCast,
@@ -100,7 +193,9 @@ export function FullPlayerScreen({
   isPlaying: boolean;
   position: number;
   duration: number;
-  isRepeat: boolean;
+  loopMode: 'normal' | 'shuffle' | 'repeat1';
+  volume: number;
+  onVolumeChange: (vol: number) => void;
   isAdded: boolean;
   isCasting: boolean;
   onClose: () => void;
@@ -111,6 +206,7 @@ export function FullPlayerScreen({
   onToggleLike: (track: Track) => void;
   onToggleAdd: (track: Track) => void;
   onShare: () => void;
+  onDownload: (track: Track) => void;
   onSetRingtone: () => void;
   onAddToPlaylist: () => void;
   onToggleCast: () => void;
@@ -118,6 +214,28 @@ export function FullPlayerScreen({
 }) {
   const [progressWidth, setProgressWidth] = useState(1);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEqualizerVisible, setIsEqualizerVisible] = useState(false);
+  const [selectedPreset, setSelectedPreset] = useState('Normal');
+  const [eqBands, setEqBands] = useState([
+    { label: '60 Hz', value: 0 },
+    { label: '230 Hz', value: 0 },
+    { label: '910 Hz', value: 0 },
+    { label: '4 kHz', value: 0 },
+    { label: '14 kHz', value: 0 },
+  ]);
+
+  const applyPreset = (name: string) => {
+    setSelectedPreset(name);
+    const values = EQ_PRESETS[name] || [0, 0, 0, 0, 0];
+    setEqBands([
+      { label: '60 Hz', value: values[0] },
+      { label: '230 Hz', value: values[1] },
+      { label: '910 Hz', value: values[2] },
+      { label: '4 kHz', value: values[3] },
+      { label: '14 kHz', value: values[4] },
+    ]);
+  };
+
   const progress = duration > 0 ? Math.min(position / duration, 1) : 0;
   const coverSpin = useRef(new Animated.Value(0)).current;
   const visualizerValues = useRef(
@@ -215,6 +333,13 @@ export function FullPlayerScreen({
             }}
           />
           <MenuAction
+            label="Telecharger"
+            onPress={() => {
+              setIsMenuOpen(false);
+              onDownload(track);
+            }}
+          />
+          <MenuAction
             label="Partager"
             onPress={() => {
               setIsMenuOpen(false);
@@ -267,9 +392,9 @@ export function FullPlayerScreen({
         </Pressable>
 
         <View style={styles.fullControls}>
-          <Pressable onPress={onToggleRepeat} style={styles.fullIconButton}>
-            <Text style={[styles.fullControlIcon, isRepeat && styles.fullControlActive]}>
-              ↹
+          <Pressable onPress={() => setIsEqualizerVisible(true)} style={styles.fullIconButton}>
+            <Text style={[styles.fullControlIcon, isEqualizerVisible && styles.fullControlActive]}>
+              🎛️
             </Text>
           </Pressable>
           <Pressable onPress={onPrevious} style={styles.fullIconButton}>
@@ -282,8 +407,8 @@ export function FullPlayerScreen({
             <Text style={styles.fullControlIcon}>▶I</Text>
           </Pressable>
           <Pressable onPress={onToggleRepeat} style={styles.fullIconButton}>
-            <Text style={[styles.fullControlIcon, isRepeat && styles.fullControlActive]}>
-              ↻
+            <Text style={[styles.fullControlIcon, loopMode !== 'normal' && styles.fullControlActive]}>
+              {loopMode === 'shuffle' ? '🔀' : loopMode === 'repeat1' ? '🔂' : '↻'}
             </Text>
           </Pressable>
         </View>
@@ -310,6 +435,67 @@ export function FullPlayerScreen({
           />
         </View>
       </ScrollView>
+
+      {isEqualizerVisible && (
+        <View style={styles.eqOverlay}>
+          <View style={styles.eqHeader}>
+            <Text style={styles.eqTitle}>Égaliseur & Volume</Text>
+            <Pressable onPress={() => setIsEqualizerVisible(false)} hitSlop={10}>
+              <Text style={styles.eqCloseText}>✕</Text>
+            </Pressable>
+          </View>
+
+          {/* Volume */}
+          <View style={styles.eqSection}>
+            <Text style={styles.eqSectionTitle}>Volume</Text>
+            <VolumeSlider value={volume} onChange={onVolumeChange} />
+          </View>
+
+          {/* Presets */}
+          <View style={styles.eqSection}>
+            <Text style={styles.eqSectionTitle}>Préréglages</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{marginVertical: 5}}>
+              {Object.keys(EQ_PRESETS).map(name => (
+                <Pressable
+                  key={name}
+                  onPress={() => applyPreset(name)}
+                  style={[
+                    styles.eqPresetButton,
+                    selectedPreset === name && styles.eqPresetButtonActive
+                  ]}
+                >
+                  <Text style={[
+                    styles.eqPresetText,
+                    selectedPreset === name && styles.eqPresetTextActive
+                  ]}>
+                    {name}
+                  </Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
+
+          {/* Bands */}
+          <View style={styles.eqSection}>
+            <Text style={styles.eqSectionTitle}>Bandes</Text>
+            <View style={styles.eqBandsContainer}>
+              {eqBands.map((band, idx) => (
+                <EqualizerBand
+                  key={band.label}
+                  label={band.label}
+                  value={band.value}
+                  onChange={(val) => {
+                    setSelectedPreset('Manuel');
+                    const newBands = [...eqBands];
+                    newBands[idx] = { ...newBands[idx], value: val };
+                    setEqBands(newBands);
+                  }}
+                />
+              ))}
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   );
 }

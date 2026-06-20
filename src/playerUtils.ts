@@ -41,8 +41,10 @@ export function mapLocalSong(song: LocalSong): Track {
     artist: song.artist || 'Telephone',
     genre: 'Local',
     region: song.album || 'Telephone',
+    album: song.album,
     cover: defaultCover,
     audio: song.uri,
+    mimeType: song.mimeType,
     duration: song.durationMs ? formatTime(song.durationMs / 1000) : '0:00',
     plays: 'Local',
   };

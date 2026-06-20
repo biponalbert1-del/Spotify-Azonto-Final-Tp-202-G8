@@ -10,7 +10,8 @@ class LocalSongsPackage : ReactPackage {
     listOf(
       LocalSongsModule(reactContext),
       RingtoneModule(reactContext),
-      PlayerNotificationModule(reactContext)
+      PlayerNotificationModule(reactContext),
+      PhoneAuthModule(reactContext)
     )
 
   override fun createViewManagers(

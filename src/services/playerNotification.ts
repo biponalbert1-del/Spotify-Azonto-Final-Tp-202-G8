@@ -14,6 +14,7 @@ const {PlayerNotification} = NativeModules as {
       duration: number,
       isPlaying: boolean,
     ) => void;
+    alert: (title: string, message: string) => void;
     hide: () => void;
   };
 };
@@ -60,6 +61,19 @@ export async function showPlayerNotification({
 
 export function hidePlayerNotification() {
   PlayerNotification?.hide();
+}
+
+export async function showAppNotification(title: string, message: string) {
+  if (!PlayerNotification) {
+    return;
+  }
+
+  const granted = await requestNotificationPermission();
+  if (!granted) {
+    return;
+  }
+
+  PlayerNotification.alert(title, message);
 }
 
 export function subscribePlayerNotification(

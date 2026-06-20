@@ -20,6 +20,7 @@ class PlayerNotificationModule(private val reactContext: ReactApplicationContext
   ReactContextBaseJavaModule(reactContext) {
 
   private val channelId = "azonto_player"
+  private val alertChannelId = "azonto_activity"
   private val notificationId = 202
   private val actionPrevious = "com.azonto.PLAYER_PREVIOUS"
   private val actionToggle = "com.azonto.PLAYER_TOGGLE"
@@ -67,6 +68,13 @@ class PlayerNotificationModule(private val reactContext: ReactApplicationContext
       NotificationManager.IMPORTANCE_LOW
     )
     manager.createNotificationChannel(channel)
+
+    val alertChannel = NotificationChannel(
+      alertChannelId,
+      "Activite Azonto",
+      NotificationManager.IMPORTANCE_HIGH
+    )
+    manager.createNotificationChannel(alertChannel)
   }
 
   private fun actionIntent(action: String, requestCode: Int): PendingIntent {
@@ -175,5 +183,36 @@ class PlayerNotificationModule(private val reactContext: ReactApplicationContext
     val manager =
       reactContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     manager.cancel(notificationId)
+  }
+
+  @ReactMethod
+  fun alert(title: String, message: String) {
+    val manager =
+      reactContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    ensureChannel(manager)
+
+    val builder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      Notification.Builder(reactContext, alertChannelId)
+    } else {
+      Notification.Builder(reactContext)
+    }
+
+    builder
+      .setSmallIcon(R.drawable.ic_azonto_notification)
+      .setContentTitle(title)
+      .setContentText(message)
+      .setStyle(Notification.BigTextStyle().bigText(message))
+      .setContentIntent(contentIntent())
+      .setAutoCancel(true)
+      .setShowWhen(true)
+      .setColor(Color.rgb(255, 122, 8))
+      .setCategory(Notification.CATEGORY_STATUS)
+      .setVisibility(Notification.VISIBILITY_PUBLIC)
+
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+      builder.setPriority(Notification.PRIORITY_HIGH)
+    }
+
+    manager.notify((System.currentTimeMillis() % Int.MAX_VALUE).toInt(), builder.build())
   }
 }
