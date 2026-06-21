@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "739189169310",
+    "project_id": "spotify-fa4cb",
+    "storage_bucket": "spotify-fa4cb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:739189169310:android:c6eb14567a7e31037fef8f",
+        "android_client_info": {
+          "package_name": "com.monentreprise.enregistrementfirebase"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYwikxdR1hVyqfIklq4GCnX6gglHSWxVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
